@@ -10,9 +10,32 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Menu, LogIn, LogOut } from "lucide-react";
 import { usePrivy } from "@privy-io/react-auth";
+import { useEffect } from "react";
+import { createOrUpdateUser } from "@/utils/db/actions";
 
 export default function Navbar() {
   const { login, logout, authenticated, user } = usePrivy();
+
+  useEffect(() => {
+    if (authenticated && user) {
+      handleUserAuthenticated();
+    }
+  }, [authenticated, user]);
+
+  console.log("all about the users", user);
+
+  const handleUserAuthenticated = async () => {
+    if (user && user.wallet?.address) {
+      try {
+        await createOrUpdateUser(
+          user.wallet.address,
+          user.email?.address || ""
+        );
+      } catch (error) {
+        console.error("Error updating user information:", error);
+      }
+    }
+  };
 
   const handleAuth = () => {
     if (authenticated) {

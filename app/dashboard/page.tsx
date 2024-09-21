@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert } from "@/components/ui/alert";
 import {
   BarChart,
   Globe,
@@ -21,6 +22,12 @@ import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/Navbar";
 import DeploymentVisual from "@/components/DeploymentVisual";
 import { Label } from "@/components/ui/label";
+import {
+  getUserIdByEmail,
+  createWebpage,
+  initializeClients,
+} from "@/utils/db/actions";
+import { usePrivy } from "@privy-io/react-auth";
 
 export default function Dashboard() {
   const [sites, setSites] = useState([
@@ -238,20 +245,66 @@ export default function Dashboard() {
   const [isDeploying, setIsDeploying] = useState(false);
   const [livePreview, setLivePreview] = useState(code);
   const [activeTab, setActiveTab] = useState("sites");
+  const [domain, setDomain] = useState("");
+  const [content, setContent] = useState("");
+  const [deploymentError, setDeploymentError] = useState("");
+  const [isInitialized, setIsInitialized] = useState(false);
+  const { user, authenticated } = usePrivy();
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     // Update live preview when code changes
     setLivePreview(code);
   }, [code]);
 
+  useEffect(() => {
+    initializeClients()
+      .then(() => setIsInitialized(true))
+      .catch((error) => {
+        console.error("Failed to initialize clients:", error);
+        setDeploymentError("Failed to initialize. Please try again later.");
+      });
+  }, []);
+
+  useEffect(() => {
+    async function fetchUserId() {
+      if (authenticated && user?.email) {
+        const fetchedUserId = await getUserIdByEmail(user?.email);
+        setUserId(fetchedUserId);
+      }
+    }
+
+    fetchUserId();
+  }, [authenticated, user]);
+
+  console.log(userId);
   const handleDeploy = async () => {
     setIsDeploying(true);
-    // Simulate deployment process
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setDeployedUrl(
-      `https://http3.io/${Math.random().toString(36).substring(7)}`
-    );
-    setIsDeploying(false);
+    setDeploymentError("");
+    try {
+      if (!isInitialized) {
+        throw new Error("Clients not initialized");
+      }
+      if (userId === null) {
+        throw new Error("User not authenticated or ID not found");
+      }
+
+      const { txHash, cid, deploymentUrl } = await createWebpage(
+        userId,
+        domain,
+        content
+      );
+
+      setDeployedUrl(deploymentUrl);
+      console.log(
+        `Deployed successfully. Transaction hash: ${txHash}, CID: ${cid}, URL: ${deploymentUrl}`
+      );
+    } catch (error) {
+      console.error("Deployment failed:", error);
+      setDeploymentError("Deployment failed. Please try again.");
+    } finally {
+      setIsDeploying(false);
+    }
   };
 
   return (
@@ -580,56 +633,28 @@ export default function Dashboard() {
                 <CardTitle className="text-2xl">Deploy a New Website</CardTitle>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="editor" className="space-y-4">
-                  <TabsList>
-                    <TabsTrigger value="editor">Code Editor</TabsTrigger>
-                    <TabsTrigger value="github">GitHub Link</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="editor" className="space-y-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="code-editor" className="text-lg">
-                          Code Editor
-                        </Label>
-                        <Textarea
-                          id="code-editor"
-                          placeholder="Enter your HTML/CSS/JavaScript code here"
-                          value={code}
-                          onChange={(e) => {
-                            setCode(e.target.value);
-                            setLivePreview(e.target.value);
-                          }}
-                          className="min-h-[400px] font-mono text-sm"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="live-preview" className="text-lg">
-                          Live Preview
-                        </Label>
-                        <div className="border rounded-lg overflow-hidden h-[400px] bg-white">
-                          <iframe
-                            id="live-preview"
-                            srcDoc={livePreview}
-                            className="w-full h-full"
-                            title="Live Preview"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="github">
-                    <Input
-                      placeholder="Enter GitHub repository URL"
-                      value={githubUrl}
-                      onChange={(e) => setGithubUrl(e.target.value)}
-                      className="mb-4"
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="content" className="text-lg">
+                      Content
+                    </Label>
+                    <Textarea
+                      id="content"
+                      placeholder="Enter your HTML content"
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      className="mt-1 min-h-[200px] font-mono text-sm"
                     />
-                  </TabsContent>
-                </Tabs>
-                <div className="mt-6">
+                  </div>
                   <Button
                     onClick={handleDeploy}
-                    disabled={isDeploying}
+                    disabled={
+                      isDeploying ||
+                      !domain ||
+                      !content ||
+                      !isInitialized ||
+                      userId === null
+                    }
                     size="lg"
                   >
                     {isDeploying ? (
@@ -641,6 +666,9 @@ export default function Dashboard() {
                       "Deploy to HTTP3"
                     )}
                   </Button>
+                  {deploymentError && (
+                    <p className="text-red-500 mt-2">{deploymentError}</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
