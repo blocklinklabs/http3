@@ -1,12 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert } from "@/components/ui/alert";
 import {
   BarChart,
   Globe,
@@ -17,6 +16,11 @@ import {
   Users,
   Clock,
   Loader2,
+  Layout,
+  Rocket,
+  GitBranch,
+  Cpu,
+  Network,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/Navbar";
@@ -24,10 +28,42 @@ import DeploymentVisual from "@/components/DeploymentVisual";
 import { Label } from "@/components/ui/label";
 import {
   getUserIdByEmail,
-  createWebpage,
+  createWebpageWithName,
+  updateWebpageContent,
   initializeClients,
+  getUserWebpages,
+  getWebpageContent,
 } from "@/utils/db/actions";
 import { usePrivy } from "@privy-io/react-auth";
+import CICDManager from "@/components/CICDManager";
+import { email } from "@web3-storage/w3up-client/types";
+import { useRouter } from "next/navigation";
+import { AIWebsiteGenerator } from "@/components/AIWebsiteGenerator";
+import { DecentralizedCDN } from "@/components/DecentralizedCDN";
+
+// Add this type definition
+type Webpage = {
+  webpages: {
+    id: number;
+    domain: string;
+    cid: string;
+    name: string | null;
+  };
+  deployments: {
+    id: number;
+    deploymentUrl: string;
+    deployedAt: Date | null;
+    transactionHash: string;
+  } | null;
+};
+
+const truncateUrl = (url: string, maxLength: number = 30) => {
+  if (!url) return "";
+  if (url.length <= maxLength) return url;
+  const start = url.substring(0, maxLength / 2 - 2);
+  const end = url.substring(url.length - maxLength / 2 + 2);
+  return `${start}...${end}`;
+};
 
 export default function Dashboard() {
   const [sites, setSites] = useState([
@@ -69,55 +105,6 @@ export default function Dashboard() {
     );
   };
 
-  const dummyAnalytics = {
-    totalVisits: 5000,
-    uniqueVisitors: 3200,
-    avgSessionDuration: "2m 34s",
-    bounceRate: "45%",
-    topPages: [
-      { url: "/home", visits: 2000 },
-      { url: "/about", visits: 1500 },
-      { url: "/products", visits: 1000 },
-    ],
-    trafficSources: [
-      { source: "Direct", percentage: 40 },
-      { source: "Search", percentage: 30 },
-      { source: "Social", percentage: 20 },
-      { source: "Referral", percentage: 10 },
-    ],
-  };
-
-  const dummySecurityEvents = [
-    {
-      id: 1,
-      type: "DDoS Attempt",
-      date: "2023-03-15 10:30",
-      status: "Blocked",
-      severity: "High",
-    },
-    {
-      id: 2,
-      type: "Unauthorized Access",
-      date: "2023-03-14 15:45",
-      status: "Prevented",
-      severity: "Medium",
-    },
-    {
-      id: 3,
-      type: "SSL Certificate Renewal",
-      date: "2023-03-13 09:00",
-      status: "Completed",
-      severity: "Low",
-    },
-    {
-      id: 4,
-      type: "Suspicious Traffic",
-      date: "2023-03-12 22:15",
-      status: "Investigating",
-      severity: "Medium",
-    },
-  ];
-
   const dummyTokenEconomy = {
     balance: 1000,
     staked: 500,
@@ -129,117 +116,7 @@ export default function Dashboard() {
     ],
   };
 
-  const [code, setCode] = useState(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bouncing Ball Game</title>
-    <style>
-        body { margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; }
-        #gameCanvas { border: 2px solid #333; border-radius: 10px; background-color: #fff; }
-    </style>
-</head>
-<body>
-    <canvas id="gameCanvas" width="600" height="200"></canvas>
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        let ball = { x: 50, y: 100, radius: 20, dy: 0, jumpStrength: -10 };
-        let obstacles = [];
-        let score = 0;
-        let gameOver = false;
-        
-        function drawBall() {
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-            ctx.fillStyle = '#4CAF50';
-            ctx.fill();
-            ctx.closePath();
-        }
-        
-        function drawObstacles() {
-            ctx.fillStyle = '#FF5722';
-            obstacles.forEach(obs => {
-                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-            });
-        }
-        
-        function jump() {
-            if (ball.y === canvas.height - ball.radius) {
-                ball.dy = ball.jumpStrength;
-            }
-        }
-        
-        function checkCollision(ball, obstacle) {
-            return ball.x + ball.radius > obstacle.x &&
-                   ball.x - ball.radius < obstacle.x + obstacle.width &&
-                   ball.y + ball.radius > obstacle.y;
-        }
-        
-        function updateGame() {
-            if (gameOver) return;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            ball.dy += 0.8; // gravity
-            ball.y += ball.dy;
-            
-            if (ball.y + ball.radius > canvas.height) {
-                ball.y = canvas.height - ball.radius;
-                ball.dy = 0;
-            }
-            
-            obstacles.forEach(obs => {
-                obs.x -= 5;
-                if (checkCollision(ball, obs)) {
-                    gameOver = true;
-                }
-            });
-            
-            if (Math.random() < 0.02 && obstacles.length < 3) {
-                obstacles.push({ x: canvas.width, y: canvas.height - 40, width: 20, height: 40 });
-            }
-            
-            obstacles = obstacles.filter(obs => obs.x > -20);
-            
-            score++;
-            
-            drawBall();
-            drawObstacles();
-            
-            ctx.fillStyle = '#333';
-            ctx.font = '20px Arial';
-            ctx.fillText('Score: ' + score, 20, 30);
-            
-            if (gameOver) {
-                ctx.fillStyle = '#E53935';
-                ctx.font = '40px Arial';
-                ctx.fillText('Game Over', canvas.width / 2 - 100, canvas.height / 2);
-            } else {
-                requestAnimationFrame(updateGame);
-            }
-        }
-        
-        canvas.addEventListener('click', () => {
-            if (gameOver) {
-                gameOver = false;
-                ball = { x: 50, y: 100, radius: 20, dy: 0, jumpStrength: -10 };
-                obstacles = [];
-                score = 0;
-                updateGame();
-            } else {
-                jump();
-            }
-        });
-        
-        updateGame();
-    </script>
-</body>
-</html>
-  `);
+  const [code, setCode] = useState(``);
   const [githubUrl, setGithubUrl] = useState("");
   const [deployedUrl, setDeployedUrl] = useState("");
   const [isDeploying, setIsDeploying] = useState(false);
@@ -251,6 +128,12 @@ export default function Dashboard() {
   const [isInitialized, setIsInitialized] = useState(false);
   const { user, authenticated } = usePrivy();
   const [userId, setUserId] = useState<number | null>(null);
+  const [w3name, setW3name] = useState<string | null>(null);
+  const [userWebpages, setUserWebpages] = useState<Webpage[]>([]);
+  const [selectedWebpage, setSelectedWebpage] = useState<Webpage | null>(null);
+  const router = useRouter();
+
+  console.log(userId);
 
   useEffect(() => {
     // Update live preview when code changes
@@ -268,8 +151,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function fetchUserId() {
-      if (authenticated && user?.email) {
-        const fetchedUserId = await getUserIdByEmail(user?.email);
+      if (authenticated && user?.email?.address) {
+        const fetchedUserId = await getUserIdByEmail(user?.email?.address);
+        console.log(fetchUserId);
+        console.log(user.email.address);
         setUserId(fetchedUserId);
       }
     }
@@ -289,16 +174,20 @@ export default function Dashboard() {
         throw new Error("User not authenticated or ID not found");
       }
 
-      const { txHash, cid, deploymentUrl } = await createWebpage(
-        userId,
-        domain,
-        content
+      const { webpage, txHash, cid, deploymentUrl, name, w3nameUrl } =
+        await createWebpageWithName(userId, domain, content);
+
+      setDeployedUrl(w3nameUrl || deploymentUrl);
+      setW3name(name);
+      console.log(
+        `Deployed successfully. Transaction hash: ${txHash}, CID: ${cid}, URL: ${
+          w3nameUrl || deploymentUrl
+        }, W3name: ${name}`
       );
 
-      setDeployedUrl(deploymentUrl);
-      console.log(
-        `Deployed successfully. Transaction hash: ${txHash}, CID: ${cid}, URL: ${deploymentUrl}`
-      );
+      // Refresh the user's webpages
+      const updatedWebpages = await getUserWebpages(userId);
+      setUserWebpages(updatedWebpages as Webpage[]);
     } catch (error) {
       console.error("Deployment failed:", error);
       setDeploymentError("Deployment failed. Please try again.");
@@ -307,335 +196,284 @@ export default function Dashboard() {
     }
   };
 
+  const handleUpdate = async () => {
+    setIsDeploying(true);
+    setDeploymentError("");
+    try {
+      if (!isInitialized || userId === null || !selectedWebpage) {
+        throw new Error(
+          "Cannot update: missing initialization, user ID, or selected webpage"
+        );
+      }
+
+      const { txHash, cid, deploymentUrl, w3nameUrl } =
+        await updateWebpageContent(
+          userId,
+          selectedWebpage.webpages.id,
+          content
+        );
+
+      setDeployedUrl(w3nameUrl || deploymentUrl);
+      console.log(
+        `Updated successfully. Transaction hash: ${txHash}, CID: ${cid}, URL: ${
+          w3nameUrl || deploymentUrl
+        }`
+      );
+      setLivePreview(content);
+
+      // Update the selected webpage in the state
+      setSelectedWebpage((prev) => {
+        if (!prev) return null;
+        return {
+          webpages: {
+            ...prev.webpages,
+            cid,
+          },
+          deployments: {
+            id: prev.deployments?.id ?? 0,
+            deploymentUrl,
+            transactionHash: txHash,
+            deployedAt: new Date(),
+          },
+        };
+      });
+
+      // Refresh the user's webpages
+      const updatedWebpages = await getUserWebpages(userId);
+      setUserWebpages(updatedWebpages as Webpage[]);
+    } catch (error: any) {
+      console.error("Update failed:", error);
+      setDeploymentError(`Update failed: ${error.message}`);
+    } finally {
+      setIsDeploying(false);
+    }
+  };
+
+  useEffect(() => {
+    async function fetchUserWebpages() {
+      if (userId) {
+        const webpages = await getUserWebpages(userId);
+        console.log("=======web pages", webpages);
+        setUserWebpages(webpages as Webpage[]);
+      }
+    }
+    fetchUserWebpages();
+  }, [userId]);
+
+  const handleEdit = async (webpage: Webpage) => {
+    setSelectedWebpage(webpage);
+    setDomain(webpage.webpages.domain);
+    const webpageContent = await getWebpageContent(webpage.webpages.id);
+    setContent(webpageContent);
+    setW3name(webpage.webpages.name);
+    setActiveTab("deploy");
+  };
+
+  const handleUrlClick = useCallback((url: string) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }, []);
+
+  const handleAIWebsiteDeploy = async (domain: string, content: string) => {
+    setIsDeploying(true);
+    setDeploymentError("");
+    try {
+      if (!isInitialized || userId === null) {
+        throw new Error("Cannot deploy: missing initialization or user ID");
+      }
+
+      const { webpage, txHash, cid, deploymentUrl, name, w3nameUrl } =
+        await createWebpageWithName(userId, domain, content);
+
+      setDeployedUrl(w3nameUrl || deploymentUrl);
+      setW3name(name);
+      console.log(
+        `Deployed AI-generated website successfully. Transaction hash: ${txHash}, CID: ${cid}, URL: ${
+          w3nameUrl || deploymentUrl
+        }, W3name: ${name}`
+      );
+
+      // Refresh the user's webpages
+      const updatedWebpages = await getUserWebpages(userId);
+      setUserWebpages(updatedWebpages as Webpage[]);
+    } catch (error: any) {
+      console.error("AI website deployment failed:", error);
+      setDeploymentError(`AI website deployment failed: ${error.message}`);
+    } finally {
+      setIsDeploying(false);
+    }
+  };
+
+  const tabsWithIcons = [
+    { name: "sites", icon: Layout },
+    { name: "deploy", icon: Rocket },
+    { name: "CI-CD", icon: GitBranch },
+    { name: "tokens", icon: Zap },
+    { name: "AI Website", icon: Cpu },
+    { name: "Decentralized CDN", icon: Network },
+  ];
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen mx-10 bg-black text-gray-300">
       <div className="container mx-auto px-4">
         <Navbar />
-        <h1 className="text-4xl font-bold mb-8">Welcome to Your Dashboard</h1>
+        <h1 className="text-4xl font-bold mb-8 text-white">
+          Welcome to Your Dashboard
+        </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-gray-900 border-gray-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Sites</CardTitle>
-              <Globe className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{sites.length}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Traffic
+              <CardTitle className="text-sm font-medium text-gray-400">
+                Total Websites
               </CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <Globe className="h-4 w-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {sites.reduce((acc, site) => acc + site.traffic, 0)}
+              <div className="text-2xl font-bold text-white">
+                {userWebpages.length}
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-gray-900 border-gray-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Average Uptime
+              <CardTitle className="text-sm font-medium text-gray-400">
+                Latest Deployment
               </CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
+              <Clock className="h-4 w-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {(
-                  sites.reduce((acc, site) => acc + site.uptime, 0) /
-                  sites.length
-                ).toFixed(2)}
-                %
+              <div className="text-2xl font-bold text-white">
+                {userWebpages.length > 0
+                  ? new Date(
+                      Math.max(
+                        ...userWebpages
+                          .filter((w) => w.deployments?.deployedAt)
+                          .map((w) => w.deployments!.deployedAt!.getTime())
+                      )
+                    ).toLocaleDateString()
+                  : "N/A"}
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-gray-900 border-gray-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Token Balance
+              <CardTitle className="text-sm font-medium text-gray-400">
+                Total Deployments
               </CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <Activity className="h-4 w-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {dummyTokenEconomy.balance} HTTP3
+              <div className="text-2xl font-bold text-white">
+                {userWebpages.filter((w) => w.deployments).length}
               </div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs
+          defaultValue="sites"
           value={activeTab}
           onValueChange={setActiveTab}
           className="space-y-8"
         >
-          <TabsList className="grid w-full grid-cols-5 rounded-xl bg-muted p-1">
-            {["sites", "analytics", "security", "tokens", "deploy"].map(
-              (tab) => (
-                <TabsTrigger
-                  key={tab}
-                  value={tab}
-                  className={`rounded-lg transition-all ${
-                    activeTab === tab
-                      ? "bg-background text-foreground shadow-sm"
-                      : "hover:bg-muted-foreground/20"
-                  }`}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </TabsTrigger>
-              )
-            )}
+          <TabsList className="grid w-full grid-cols-6 rounded-xl bg-gray-900 p-1">
+            {tabsWithIcons.map((tab) => (
+              <TabsTrigger
+                key={tab.name}
+                value={tab.name}
+                onClick={() => setActiveTab(tab.name)}
+                className={`rounded-lg transition-all ${
+                  activeTab === tab.name
+                    ? "bg-gray-800 text-white font-bold shadow-lg"
+                    : "text-gray-400 hover:bg-gray-800/50"
+                }`}
+              >
+                <tab.icon className="w-4 h-4 mr-2" />
+                {tab.name.charAt(0).toUpperCase() + tab.name.slice(1)}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
           <TabsContent value="sites">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sites.map((site) => (
-                <Card key={site.id}>
+              {userWebpages.map((webpage) => (
+                <Card
+                  key={webpage.webpages.id}
+                  className="bg-gray-900 border-gray-800"
+                >
                   <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
+                    <CardTitle className="flex items-center justify-between text-white">
                       <span className="flex items-center">
                         <Globe className="mr-2 h-4 w-4" />
-                        {site.name}
-                      </span>
-                      <span
-                        className={`text-sm px-2 py-1 rounded ${
-                          site.status === "Active"
-                            ? "bg-green-500"
-                            : "bg-yellow-500"
-                        }`}
-                      >
-                        {site.status}
+                        {webpage.webpages.domain}
                       </span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="mb-2 text-sm text-muted-foreground">
-                      {site.url}
+                    <p
+                      className="mb-2 text-sm text-blue-400 cursor-pointer hover:underline overflow-hidden text-ellipsis"
+                      onClick={() =>
+                        handleUrlClick(
+                          webpage.webpages.name
+                            ? `https://dweb.link/ipfs/${webpage.webpages.cid}`
+                            : webpage.deployments?.deploymentUrl || ""
+                        )
+                      }
+                      title={
+                        webpage.webpages.name
+                          ? `https://dweb.link/ipfs/${webpage.webpages.cid}`
+                          : webpage.deployments?.deploymentUrl
+                      }
+                    >
+                      {truncateUrl(
+                        webpage.webpages.name
+                          ? `https://dweb.link/ipfs/${webpage.webpages.cid}`
+                          : webpage.deployments?.deploymentUrl || ""
+                      )}
                     </p>
-                    <p className="mb-2 text-sm">
-                      Chain: <span className="font-semibold">{site.chain}</span>
+                    <p className="mb-2 text-sm text-gray-500">
+                      Deployed:{" "}
+                      {webpage.deployments?.deployedAt?.toLocaleString()}
                     </p>
-                    <p className="mb-2 text-sm">
-                      Traffic:{" "}
-                      <span className="font-semibold">{site.traffic}</span>
+                    <p className="mb-2 text-sm overflow-hidden text-ellipsis text-gray-500">
+                      TX: {webpage.deployments?.transactionHash.slice(0, 10)}...
                     </p>
-                    <p className="mb-2 text-sm">
-                      Uptime:{" "}
-                      <span className="font-semibold">{site.uptime}%</span>
-                    </p>
-                    <p className="mb-4 text-sm">
-                      Last Deployed:{" "}
-                      <span className="font-semibold">{site.lastDeployed}</span>
-                    </p>
-                    <Input
-                      placeholder="New name"
-                      onChange={(e) => handleRename(site.id, e.target.value)}
-                      className="mb-2"
-                    />
-                    <Button className="w-full">Rename</Button>
+                    <Button
+                      onClick={() => handleEdit(webpage)}
+                      className="w-full bg-gray-800 hover:bg-gray-700 text-white"
+                    >
+                      Edit
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
             </div>
           </TabsContent>
 
-          <TabsContent value="analytics">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <BarChart className="mr-2 h-4 w-4" />
-                    Site Analytics Overview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="font-semibold">Total Visits</h3>
-                      <p className="text-2xl font-bold">
-                        {dummyAnalytics.totalVisits}
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Unique Visitors</h3>
-                      <p className="text-2xl font-bold">
-                        {dummyAnalytics.uniqueVisitors}
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Avg. Session Duration</h3>
-                      <p className="text-2xl font-bold">
-                        {dummyAnalytics.avgSessionDuration}
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Bounce Rate</h3>
-                      <p className="text-2xl font-bold">
-                        {dummyAnalytics.bounceRate}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Activity className="mr-2 h-4 w-4" />
-                    Top Pages
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul>
-                    {dummyAnalytics.topPages.map((page, index) => (
-                      <li key={index} className="mb-2 flex justify-between">
-                        <span>{page.url}</span>
-                        <span className="font-semibold">
-                          {page.visits} visits
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Users className="mr-2 h-4 w-4" />
-                    Traffic Sources
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {dummyAnalytics.trafficSources.map((source, index) => (
-                    <div key={index} className="mb-2">
-                      <div className="flex justify-between mb-1">
-                        <span>{source.source}</span>
-                        <span>{source.percentage}%</span>
-                      </div>
-                      <Progress value={source.percentage} className="h-2" />
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Shield className="mr-2 h-4 w-4" />
-                  Security Events
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul>
-                  {dummySecurityEvents.map((event) => (
-                    <li key={event.id} className="mb-4 p-3 border rounded-lg">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-semibold">{event.type}</span>
-                        <span
-                          className={`text-sm px-2 py-1 rounded ${
-                            event.severity === "High"
-                              ? "bg-red-500"
-                              : event.severity === "Medium"
-                              ? "bg-yellow-500"
-                              : "bg-green-500"
-                          }`}
-                        >
-                          {event.severity}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Date: {event.date}
-                      </p>
-                      <p className="text-sm">
-                        Status:{" "}
-                        <span className="font-semibold">{event.status}</span>
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="tokens">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Zap className="mr-2 h-4 w-4" />
-                    Token Overview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="font-semibold">HTTP3 Token Balance</h3>
-                      <p className="text-2xl font-bold">
-                        {dummyTokenEconomy.balance} HTTP3
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Staked Amount</h3>
-                      <p className="text-2xl font-bold">
-                        {dummyTokenEconomy.staked} HTTP3
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Rewards Earned</h3>
-                      <p className="text-2xl font-bold">
-                        {dummyTokenEconomy.rewards} HTTP3
-                      </p>
-                    </div>
-                  </div>
-                  <Button className="mt-4 w-full">Stake Tokens</Button>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Clock className="mr-2 h-4 w-4" />
-                    Recent Transactions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul>
-                    {dummyTokenEconomy.transactions.map((tx) => (
-                      <li
-                        key={tx.id}
-                        className="mb-2 flex justify-between items-center"
-                      >
-                        <span>{tx.type}</span>
-                        <span
-                          className={`font-semibold ${
-                            tx.amount > 0 ? "text-green-500" : "text-red-500"
-                          }`}
-                        >
-                          {tx.amount > 0 ? "+" : ""}
-                          {tx.amount} HTTP3
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
           <TabsContent value="deploy">
-            <Card>
+            <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
-                <CardTitle className="text-2xl">Deploy a New Website</CardTitle>
+                <CardTitle className="text-2xl text-white">
+                  {selectedWebpage ? "Edit Website" : "Deploy a New Website"}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="content" className="text-lg">
+                    <Label htmlFor="domain" className="text-lg text-gray-400">
+                      Domain
+                    </Label>
+                    <Input
+                      id="domain"
+                      placeholder="Enter your domain"
+                      value={domain}
+                      onChange={(e) => setDomain(e.target.value)}
+                      className="mt-1 bg-gray-800 text-white border-gray-700"
+                      disabled={!!selectedWebpage}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="content" className="text-lg text-gray-400">
                       Content
                     </Label>
                     <Textarea
@@ -643,11 +481,11 @@ export default function Dashboard() {
                       placeholder="Enter your HTML content"
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
-                      className="mt-1 min-h-[200px] font-mono text-sm"
+                      className="mt-1 min-h-[200px] font-mono text-sm bg-gray-800 text-white border-gray-700"
                     />
                   </div>
                   <Button
-                    onClick={handleDeploy}
+                    onClick={selectedWebpage ? handleUpdate : handleDeploy}
                     disabled={
                       isDeploying ||
                       !domain ||
@@ -656,29 +494,141 @@ export default function Dashboard() {
                       userId === null
                     }
                     size="lg"
+                    className="bg-blue-600 hover:bg-blue-500 text-white"
                   >
                     {isDeploying ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Deploying...
+                        {selectedWebpage ? "Updating..." : "Deploying..."}
                       </>
+                    ) : selectedWebpage ? (
+                      "Update Website"
                     ) : (
                       "Deploy to HTTP3"
                     )}
                   </Button>
                   {deploymentError && (
-                    <p className="text-red-500 mt-2">{deploymentError}</p>
+                    <p className="text-red-400 mt-2">{deploymentError}</p>
                   )}
                 </div>
               </CardContent>
             </Card>
+            {content && (
+              <Card className="mt-4 bg-gray-900 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white">Preview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="border border-gray-800 p-4 rounded-lg">
+                    <iframe
+                      srcDoc={content}
+                      style={{ width: "100%", height: "400px", border: "none" }}
+                      title="Website Preview"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             {deployedUrl && <DeploymentVisual deployedUrl={deployedUrl} />}
+          </TabsContent>
+
+          <TabsContent value="CI-DC">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {userWebpages.map((webpage) => (
+                <Card
+                  key={webpage.webpages.id}
+                  className="bg-gray-900 border-gray-800"
+                >
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between text-white">
+                      <span className="flex items-center">
+                        <Globe className="mr-2 h-4 w-4" />
+                        {webpage.webpages.domain}
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p
+                      className="mb-2 text-sm text-blue-400 cursor-pointer hover:underline overflow-hidden text-ellipsis"
+                      onClick={() =>
+                        handleUrlClick(
+                          webpage.webpages.name
+                            ? `https://dweb.link/ipfs/${webpage.webpages.cid}`
+                            : webpage.deployments?.deploymentUrl || ""
+                        )
+                      }
+                      title={
+                        webpage.webpages.name
+                          ? `https://dweb.link/ipfs/${webpage.webpages.cid}`
+                          : webpage.deployments?.deploymentUrl
+                      }
+                    >
+                      {truncateUrl(
+                        webpage.webpages.name
+                          ? `https://dweb.link/ipfs/${webpage.webpages.cid}`
+                          : webpage.deployments?.deploymentUrl || ""
+                      )}
+                    </p>
+                    <p className="mb-2 text-sm text-gray-500">
+                      Deployed:{" "}
+                      {webpage.deployments?.deployedAt?.toLocaleString()}
+                    </p>
+                    <p className="mb-2 text-sm overflow-hidden text-ellipsis text-gray-500">
+                      TX: {webpage.deployments?.transactionHash.slice(0, 10)}...
+                    </p>
+                    <Button
+                      onClick={() => handleEdit(webpage)}
+                      className="w-full bg-gray-800 hover:bg-gray-700 text-white"
+                    >
+                      Edit
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="AI Website">
+            <Card className="bg-gray-900 border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-2xl text-white">
+                  AI Website Generator
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AIWebsiteGenerator
+                  onDeploy={handleAIWebsiteDeploy}
+                  isDeploying={isDeploying}
+                />
+              </CardContent>
+            </Card>
+            {deploymentError && (
+              <p className="text-red-400 mt-2">{deploymentError}</p>
+            )}
+            {deployedUrl && <DeploymentVisual deployedUrl={deployedUrl} />}
+          </TabsContent>
+
+          <TabsContent value="Decentralized CDN">
+            <Card className="bg-gray-900 border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-2xl text-white">
+                  Decentralized Content Delivery Network
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <DecentralizedCDN />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 
         <div className="mt-12">
           <Link href="/">
-            <Button variant="outline" size="lg">
+            <Button
+              variant="outline"
+              size="lg"
+              className="bg-gray-900 hover:bg-gray-800 text-white border-gray-700"
+            >
               Back to Home
             </Button>
           </Link>

@@ -244,7 +244,6 @@ export default function DeveloperTools() {
           <Tabs defaultValue="editor" className="space-y-4">
             <TabsList>
               <TabsTrigger value="editor">Code Editor</TabsTrigger>
-              <TabsTrigger value="github">GitHub Link</TabsTrigger>
             </TabsList>
             <TabsContent value="editor" className="space-y-4">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

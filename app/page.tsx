@@ -158,9 +158,11 @@ export default function Home() {
             Powered by blockchain technology for unparalleled security and
             performance.
           </p>
-          <Button size="lg" className="mr-4">
-            Start Deploying <ArrowRight className="ml-2" />
-          </Button>
+          <Link href={"/dashboard"}>
+            <Button size="lg" className="mr-4">
+              Start Deploying <ArrowRight className="ml-2" />
+            </Button>
+          </Link>
           <Button size="lg" variant="outline">
             Explore Features
           </Button>
@@ -185,54 +187,6 @@ export default function Home() {
           </section>
           <DeveloperTools />
           <UserAccess />
-
-          <section className="mb-16">
-            <h2 className="text-3xl font-semibold mb-8 text-center">
-              Deploy Your Website
-            </h2>
-            <div className="max-w-2xl mx-auto space-y-4">
-              <Input
-                placeholder="Enter domain (e.g., mysite.http3)"
-                value={domain}
-                onChange={(e) => setDomain(e.target.value)}
-              />
-              <Textarea
-                placeholder="Enter your HTML content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={10}
-              />
-              <Button
-                onClick={handleDeploy}
-                disabled={isDeploying || !domain || !content}
-                className="w-full"
-              >
-                {isDeploying ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Deploying...
-                  </>
-                ) : (
-                  "Deploy to HTTP3"
-                )}
-              </Button>
-              {deployedUrl && (
-                <div className="mt-4 p-4 bg-secondary rounded-lg">
-                  <p className="text-center">
-                    Your website has been deployed! Access it at:{" "}
-                    <a
-                      href={deployedUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      {deployedUrl}
-                    </a>
-                  </p>
-                </div>
-              )}
-            </div>
-          </section>
 
           {/* New sections can be added here for Marketplace, Governance, etc. */}
         </main>

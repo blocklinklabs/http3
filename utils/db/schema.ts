@@ -4,6 +4,7 @@ import {
   varchar,
   integer,
   timestamp,
+  text,
 } from "drizzle-orm/pg-core";
 
 export const Users = pgTable("users", {
@@ -26,6 +27,7 @@ export const Tokens = pgTable("tokens", {
 export const Webpages = pgTable("webpages", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => Users.id),
+  name: text("name"),
   domain: varchar("domain", { length: 255 }).notNull(),
   cid: varchar("cid", { length: 255 }).notNull(),
 });
@@ -36,7 +38,8 @@ export const Deployments = pgTable("deployments", {
   webpageId: integer("webpage_id").references(() => Webpages.id),
   transactionHash: varchar("transaction_hash", { length: 66 }).notNull(),
   deployedAt: timestamp("deployed_at").defaultNow(),
-  deploymentUrl: varchar("deployment_url", { length: 255 }).notNull(), // Add this line
+  deploymentUrl: varchar("deployment_url", { length: 255 }).notNull(),
+  filecoinInfo: text("filecoin_info"), // New field to store Filecoin information
 });
 
 export type Deployment = {
