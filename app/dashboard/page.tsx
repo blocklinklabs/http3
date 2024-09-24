@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart,
   Globe,
@@ -21,6 +20,7 @@ import {
   GitBranch,
   Cpu,
   Network,
+  Search,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/Navbar";
@@ -40,7 +40,10 @@ import { email } from "@web3-storage/w3up-client/types";
 import { useRouter } from "next/navigation";
 import { AIWebsiteGenerator } from "@/components/AIWebsiteGenerator";
 import { DecentralizedCDN } from "@/components/DecentralizedCDN";
-
+import { Sidebar } from "@/components/ui/sidebar";
+import { SearchEngine } from "@/components/SearchEngine";
+import { ExampleWebsites } from "@/components/ExampleWebsites";
+import SmartContractDeployer from "@/components/SmartContractDeployer";
 // Add this type definition
 type Webpage = {
   webpages: {
@@ -121,7 +124,7 @@ export default function Dashboard() {
   const [deployedUrl, setDeployedUrl] = useState("");
   const [isDeploying, setIsDeploying] = useState(false);
   const [livePreview, setLivePreview] = useState(code);
-  const [activeTab, setActiveTab] = useState("sites");
+  const [activeTab, setActiveTab] = useState("Sites");
   const [domain, setDomain] = useState("");
   const [content, setContent] = useState("");
   const [deploymentError, setDeploymentError] = useState("");
@@ -266,7 +269,7 @@ export default function Dashboard() {
     const webpageContent = await getWebpageContent(webpage.webpages.id);
     setContent(webpageContent);
     setW3name(webpage.webpages.name);
-    setActiveTab("deploy");
+    setActiveTab("Deploy");
   };
 
   const handleUrlClick = useCallback((url: string) => {
@@ -303,98 +306,82 @@ export default function Dashboard() {
     }
   };
 
-  const tabsWithIcons = [
-    { name: "sites", icon: Layout },
-    { name: "deploy", icon: Rocket },
-    { name: "CI-CD", icon: GitBranch },
-    { name: "tokens", icon: Zap },
+  const sidebarItems = [
+    { name: "Sites", icon: Layout },
+    { name: "Deploy", icon: Rocket },
+    { name: "CI/CD", icon: GitBranch },
+    { name: "Tokens", icon: Zap },
     { name: "AI Website", icon: Cpu },
     { name: "Decentralized CDN", icon: Network },
+    { name: "Search Engine", icon: Search },
+    { name: "Example Websites", icon: Globe },
+    { name: "Smart Contracts", icon: Shield },
   ];
 
   return (
-    <div className="min-h-screen mx-10 bg-black text-gray-300">
-      <div className="container mx-auto px-4">
-        <Navbar />
-        <h1 className="text-4xl font-bold mb-8 text-white">
-          Welcome to Your Dashboard
-        </h1>
+    <div className="min-h-screen bg-black text-gray-300">
+      <div className="flex">
+        <Sidebar
+          items={sidebarItems}
+          activeItem={activeTab}
+          setActiveItem={setActiveTab}
+        />
+        <div className="flex-1 p-10 ml-64">
+          <h1 className="text-4xl font-bold mb-8 text-white">
+            Welcome to Your Dashboard
+          </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gray-900 border-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">
-                Total Websites
-              </CardTitle>
-              <Globe className="h-4 w-4 text-gray-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {userWebpages.length}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-900 border-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">
-                Latest Deployment
-              </CardTitle>
-              <Clock className="h-4 w-4 text-gray-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {userWebpages.length > 0
-                  ? new Date(
-                      Math.max(
-                        ...userWebpages
-                          .filter((w) => w.deployments?.deployedAt)
-                          .map((w) => w.deployments!.deployedAt!.getTime())
-                      )
-                    ).toLocaleDateString()
-                  : "N/A"}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-900 border-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">
-                Total Deployments
-              </CardTitle>
-              <Activity className="h-4 w-4 text-gray-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {userWebpages.filter((w) => w.deployments).length}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <Card className="bg-gray-900 border-gray-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-400">
+                  Total Websites
+                </CardTitle>
+                <Globe className="h-4 w-4 text-gray-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">
+                  {userWebpages.length}
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gray-900 border-gray-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-400">
+                  Latest Deployment
+                </CardTitle>
+                <Clock className="h-4 w-4 text-gray-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">
+                  {userWebpages.length > 0
+                    ? new Date(
+                        Math.max(
+                          ...userWebpages
+                            .filter((w) => w.deployments?.deployedAt)
+                            .map((w) => w.deployments!.deployedAt!.getTime())
+                        )
+                      ).toLocaleDateString()
+                    : "N/A"}
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gray-900 border-gray-800">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-400">
+                  Total Deployments
+                </CardTitle>
+                <Activity className="h-4 w-4 text-gray-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">
+                  {userWebpages.filter((w) => w.deployments).length}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-        <Tabs
-          defaultValue="sites"
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="space-y-8"
-        >
-          <TabsList className="grid w-full grid-cols-6 rounded-xl bg-gray-900 p-1">
-            {tabsWithIcons.map((tab) => (
-              <TabsTrigger
-                key={tab.name}
-                value={tab.name}
-                onClick={() => setActiveTab(tab.name)}
-                className={`rounded-lg transition-all ${
-                  activeTab === tab.name
-                    ? "bg-gray-800 text-white font-bold shadow-lg"
-                    : "text-gray-400 hover:bg-gray-800/50"
-                }`}
-              >
-                <tab.icon className="w-4 h-4 mr-2" />
-                {tab.name.charAt(0).toUpperCase() + tab.name.slice(1)}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-
-          <TabsContent value="sites">
+          {activeTab === "Sites" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {userWebpages.map((webpage) => (
                 <Card
@@ -448,9 +435,9 @@ export default function Dashboard() {
                 </Card>
               ))}
             </div>
-          </TabsContent>
+          )}
 
-          <TabsContent value="deploy">
+          {activeTab === "Deploy" && (
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-2xl text-white">
@@ -513,26 +500,26 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
-            {content && (
-              <Card className="mt-4 bg-gray-900 border-gray-800">
-                <CardHeader>
-                  <CardTitle className="text-white">Preview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="border border-gray-800 p-4 rounded-lg">
-                    <iframe
-                      srcDoc={content}
-                      style={{ width: "100%", height: "400px", border: "none" }}
-                      title="Website Preview"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-            {deployedUrl && <DeploymentVisual deployedUrl={deployedUrl} />}
-          </TabsContent>
+          )}
+          {content && (
+            <Card className="mt-4 bg-gray-900 border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-white">Preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="border border-gray-800 p-4 rounded-lg">
+                  <iframe
+                    srcDoc={content}
+                    style={{ width: "100%", height: "400px", border: "none" }}
+                    title="Website Preview"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {deployedUrl && <DeploymentVisual deployedUrl={deployedUrl} />}
 
-          <TabsContent value="CI-DC">
+          {activeTab === "CI/CD" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {userWebpages.map((webpage) => (
                 <Card
@@ -586,9 +573,21 @@ export default function Dashboard() {
                 </Card>
               ))}
             </div>
-          </TabsContent>
+          )}
 
-          <TabsContent value="AI Website">
+          {activeTab === "Tokens" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card className="bg-gray-900 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-2xl text-white">Tokens</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-lg text-gray-400">Coming soon</p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+          {activeTab === "AI Website" && (
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-2xl text-white">
@@ -602,13 +601,13 @@ export default function Dashboard() {
                 />
               </CardContent>
             </Card>
-            {deploymentError && (
-              <p className="text-red-400 mt-2">{deploymentError}</p>
-            )}
-            {deployedUrl && <DeploymentVisual deployedUrl={deployedUrl} />}
-          </TabsContent>
+          )}
+          {deploymentError && (
+            <p className="text-red-400 mt-2">{deploymentError}</p>
+          )}
+          {deployedUrl && <DeploymentVisual deployedUrl={deployedUrl} />}
 
-          <TabsContent value="Decentralized CDN">
+          {activeTab === "Decentralized CDN" && (
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-2xl text-white">
@@ -619,19 +618,36 @@ export default function Dashboard() {
                 <DecentralizedCDN />
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          )}
 
-        <div className="mt-12">
-          <Link href="/">
-            <Button
-              variant="outline"
-              size="lg"
-              className="bg-gray-900 hover:bg-gray-800 text-white border-gray-700"
-            >
-              Back to Home
-            </Button>
-          </Link>
+          {activeTab === "Search Engine" && <SearchEngine />}
+
+          {activeTab === "Example Websites" && <ExampleWebsites />}
+
+          {activeTab === "Smart Contracts" && (
+            <Card className="bg-gray-900 border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-2xl text-white">
+                  Deploy Smart Contract
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SmartContractDeployer />
+              </CardContent>
+            </Card>
+          )}
+
+          <div className="mt-12">
+            <Link href="/">
+              <Button
+                variant="outline"
+                size="lg"
+                className="bg-gray-900 hover:bg-gray-800 text-white border-gray-700"
+              >
+                Back to Home
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

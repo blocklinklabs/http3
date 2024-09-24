@@ -9,8 +9,8 @@ export default function DocsPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
       <div className="container mx-auto px-4 py-8">
         <Navbar />
-        <h1 className="text-4xl font-bold mb-12 text-left bg-clip-text ">
-          Documentation
+        <h1 className="text-4xl font-bold mb-12 text-left bg-clip-text">
+          HTTP3 Documentation
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
@@ -32,10 +32,10 @@ export default function DocsPage() {
                 </li>
                 <li>
                   <Link
-                    href="#deploy-website"
+                    href="#deploy-contract"
                     className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
                   >
-                    Deploy your first website
+                    Deploy your first smart contract
                   </Link>
                 </li>
                 <li>
@@ -58,10 +58,10 @@ export default function DocsPage() {
             </CardHeader>
             <CardContent>
               <ul className="space-y-2 text-white">
-                <li>Decentralized hosting on IPFS</li>
-                <li>Automatic HTTPS with ENS domains</li>
-                <li>Version control and rollbacks</li>
-                <li>CI/CD integration</li>
+                <li>One-click smart contract deployment</li>
+                <li>Automatic ABI generation</li>
+                <li>Integrated blockchain explorer</li>
+                <li>Secure key management</li>
               </ul>
             </CardContent>
           </Card>
@@ -103,10 +103,10 @@ export default function DocsPage() {
                 </li>
                 <li>
                   <Link
-                    href="#performance-optimization"
+                    href="#gas-optimization"
                     className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
                   >
-                    Performance optimization
+                    Gas optimization
                   </Link>
                 </li>
                 <li>
@@ -134,29 +134,30 @@ export default function DocsPage() {
               To get started with HTTP3, you'll need to create an account. Visit
               our homepage and click on the "Sign Up" button. Follow the prompts
               to set up your account using your email address or connect with
-              your Web3 wallet.
+              your Web3 wallet for a seamless blockchain experience.
             </p>
           </section>
 
           <section
-            id="deploy-website"
+            id="deploy-contract"
             className="bg-gray-800 p-8 rounded-lg shadow-lg"
           >
             <h2 className="text-3xl font-bold mb-6 text-white">
-              Deploy Your First Website
+              Deploy Your First Smart Contract
             </h2>
             <p className="text-gray-300 leading-relaxed mb-4">
-              Once you've created an account, you can deploy your first website
-              by following these steps:
+              Once you've created an account, you can deploy your first smart
+              contract by following these steps:
             </p>
             <ol className="list-decimal pl-5 space-y-2 text-gray-300">
               <li>Log in to your HTTP3 dashboard</li>
               <li>Click on the "New Deployment" button</li>
               <li>
-                Upload your website files or connect your GitHub repository
+                Upload your smart contract file or paste your Solidity code
               </li>
-              <li>Configure your deployment settings</li>
-              <li>Click "Deploy" and wait for the process to complete</li>
+              <li>Configure your deployment settings and parameters</li>
+              <li>Review the generated ABI and bytecode</li>
+              <li>Click "Deploy" and confirm the transaction in your wallet</li>
             </ol>
           </section>
 
@@ -168,13 +169,16 @@ export default function DocsPage() {
               Manage Your Deployments
             </h2>
             <p className="text-gray-300 leading-relaxed mb-4">
-              HTTP3 provides powerful tools to manage your deployments:
+              HTTP3 provides powerful tools to manage your smart contract
+              deployments:
             </p>
             <ul className="list-disc pl-5 space-y-2 text-gray-300">
-              <li>View deployment history and rollback to previous versions</li>
-              <li>Set up custom domains and SSL certificates</li>
-              <li>Monitor performance and traffic statistics</li>
-              <li>Configure environment variables and build settings</li>
+              <li>View deployment history and contract addresses</li>
+              <li>
+                Interact with your contracts through a user-friendly interface
+              </li>
+              <li>Monitor gas usage and optimize your contracts</li>
+              <li>Upgrade your contracts using proxy patterns</li>
             </ul>
           </section>
         </div>

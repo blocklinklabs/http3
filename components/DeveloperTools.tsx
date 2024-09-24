@@ -218,7 +218,7 @@ export default function DeveloperTools() {
           </CardHeader>
           <CardContent>
             <pre className="bg-background p-4 rounded-md">
-              <code>Preview: https://http3.io/abc123</code>
+              <code>Preview: https://ba..ipfs.link/</code>
             </pre>
             <p className="mt-4 text-sm text-muted-foreground">
               Get an instant preview link to share your deployed website.

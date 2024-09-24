@@ -1,54 +1,55 @@
-import React from "react";
-import { Home, Settings, HelpCircle, Code, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { LucideIcon } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
-export function Sidebar({ children }: { children: React.ReactNode }) {
+interface SidebarProps {
+  items: {
+    name: string;
+    icon: LucideIcon;
+  }[];
+  activeItem: string;
+  setActiveItem: (item: string) => void;
+}
+
+export function Sidebar({ items, activeItem, setActiveItem }: SidebarProps) {
   return (
-    <div className="flex flex-col w-64 bg-gray-900 border-r border-gray-800">
-      <div className="flex items-center justify-center h-14 border-b border-gray-800">
-        <span className="text-lg font-semibold text-white">HTTP3</span>
+    <div className="flex flex-col w-64 bg-gray-900 text-white h-screen fixed left-0 top-0 overflow-y-auto">
+      <div className="p-6 border-b border-gray-800">
+        <Link href="/" className="flex items-center space-x-2">
+          <Image
+            src="/svg/lock-square-rounded.svg"
+            alt="HTTP3 logo"
+            width={32}
+            height={32}
+          />
+          <span className="text-2xl font-bold">HTTP3</span>
+        </Link>
       </div>
-      <nav className="flex-1 overflow-y-auto">
-        <ul className="p-2 space-y-1">
-          <li>
-            <Link
-              href="/dashboard"
-              className="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-800 rounded"
-            >
-              <Home className="mr-3 h-5 w-5" />
-              Dashboard
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/settings"
-              className="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-800 rounded"
-            >
-              <Settings className="mr-3 h-5 w-5" />
-              Settings
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/help"
-              className="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-800 rounded"
-            >
-              <HelpCircle className="mr-3 h-5 w-5" />
-              Help
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/dashboard/ai-website-generator"
-              className="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-800 rounded"
-            >
-              <Code className="mr-3 h-5 w-5" />
-              AI Website Generator
-            </Link>
-          </li>
-        </ul>
+      <nav className="flex-1 p-4">
+        {items.map((item) => (
+          <Button
+            key={item.name}
+            variant="ghost"
+            className={cn(
+              "w-full justify-start px-4 py-3 mb-2 text-left rounded-lg transition-colors",
+              activeItem === item.name
+                ? "bg-blue-600 text-white"
+                : "text-gray-400 hover:bg-gray-800 hover:text-white"
+            )}
+            onClick={() => setActiveItem(item.name)}
+          >
+            <item.icon className="mr-3 h-5 w-5" />
+            {item.name}
+          </Button>
+        ))}
       </nav>
-      <div className="p-4 border-t border-gray-800">{children}</div>
+      <div className="p-4 border-t border-gray-800">
+        <p className="text-sm text-gray-500">
+          © 2024 HTTP3. All rights reserved.
+        </p>
+      </div>
     </div>
   );
 }

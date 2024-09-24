@@ -2,6 +2,9 @@
 import { PrivyProvider } from "@privy-io/react-auth";
 import localFont from "next/font/local";
 import "./globals.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Navbar from "@/components/Navbar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -38,8 +41,10 @@ export default function RootLayout({
             },
           }}
         >
+          <Navbar />
           {children}
         </PrivyProvider>
+        <ToastContainer />
       </body>
     </html>
   );

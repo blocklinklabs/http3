@@ -10,11 +10,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Menu, LogIn, LogOut } from "lucide-react";
 import { usePrivy } from "@privy-io/react-auth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createOrUpdateUser } from "@/utils/db/actions";
 
 export default function Navbar() {
   const { login, logout, authenticated, user } = usePrivy();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     if (authenticated && user) {
@@ -46,7 +47,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="flex justify-between items-center mb-8 py-4">
+    <nav className="flex justify-between items-center mb-8 py-8 px-4 md:px-8 lg:px-16">
       <Link href="/" className="flex items-center">
         <Image
           src="/svg/lock-square-rounded.svg"
@@ -57,7 +58,7 @@ export default function Navbar() {
         />
         <span className="ml-2 text-xl font-bold">HTTP3</span>
       </Link>
-      <div className="flex items-center space-x-4">
+      <div className="hidden md:flex items-center space-x-4">
         <Link href="/dashboard" className="text-foreground hover:text-primary">
           Dashboard
         </Link>
@@ -99,6 +100,56 @@ export default function Navbar() {
         )}
         <ModeToggle />
       </div>
+      <div className="md:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      </div>
+      {isMenuOpen && (
+        <div className="absolute top-16 left-0 right-0 bg-background border-b border-border p-4 md:hidden">
+          <div className="flex flex-col space-y-4">
+            <Link
+              href="/dashboard"
+              className="text-foreground hover:text-primary"
+            >
+              Dashboard
+            </Link>
+            <Link href="/docs" className="text-foreground hover:text-primary">
+              Docs
+            </Link>
+            <Button onClick={handleAuth} variant="outline" className="w-full">
+              {authenticated ? "Logout" : "Login"}
+            </Button>
+            {authenticated && (
+              <>
+                <Link
+                  href="/profile"
+                  className="text-foreground hover:text-primary"
+                >
+                  Profile
+                </Link>
+                <Link
+                  href="/settings"
+                  className="text-foreground hover:text-primary"
+                >
+                  Settings
+                </Link>
+                <Link
+                  href="/help"
+                  className="text-foreground hover:text-primary"
+                >
+                  Help & Support
+                </Link>
+              </>
+            )}
+            <ModeToggle />
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

@@ -183,7 +183,15 @@ export async function createWebpage(
   return { webpage, txHash, cid, deploymentUrl };
 }
 
-export async function getUserWebpages(userId: number) {
+export async function getUserWebpages(userId: number | null) {
+  if (userId === null) {
+    return db
+      .select()
+      .from(Webpages)
+      .leftJoin(Deployments, eq(Webpages.id, Deployments.webpageId))
+      .orderBy(desc(Deployments.deployedAt))
+      .execute();
+  }
   return db
     .select()
     .from(Webpages)
@@ -334,8 +342,8 @@ export async function createWebpageWithName(
   // Resolve the name to get the latest CID
   const resolvedCID = await resolveNameToCID(nameString);
 
-  // Create the w3name URL using the correct IPFS gateway format
-  const w3nameUrl = `https://dweb.link/ipfs/${resolvedCID}`;
+  // Create the w3name URL using a public IPFS gateway
+  const w3nameUrl = `https://${resolvedCID}.ipfs.dweb.link`;
 
   return { webpage, txHash, cid, deploymentUrl, name: nameString, w3nameUrl };
 }
@@ -400,7 +408,7 @@ export async function updateWebpageContent(
   if (webpage.name) {
     await updateNameContent(userId, webpage.name, newContent);
     const resolvedCID = await resolveNameToCID(webpage.name);
-    const w3nameUrl = `https://dweb.link/ipfs/${resolvedCID}`;
+    const w3nameUrl = `https://${resolvedCID}.ipfs.dweb.link`;
     return { txHash, cid, deploymentUrl, w3nameUrl };
   }
 
