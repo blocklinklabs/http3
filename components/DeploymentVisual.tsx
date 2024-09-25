@@ -50,7 +50,7 @@ export default function DeploymentVisual({
   };
 
   return (
-    <div className="deployment-visual">
+    <div className="deployment-visual text-white">
       <h2 className="text-2xl font-semibold mb-4">Deployment Status</h2>
       <div className="flex items-center justify-center mb-4">
         <p className="text-muted-foreground mr-2">
@@ -115,7 +115,7 @@ export default function DeploymentVisual({
           </pre>
         </div>
       )}
-      <div className="mt-4 p-4 bg-muted text-left">
+      <div className="mt-4 p-4 text-white bg-black text-left">
         <h3 className="font-semibold">Deployed URL:</h3>
         <p>{deployedUrl}</p>
       </div>

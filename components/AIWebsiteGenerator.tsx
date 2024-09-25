@@ -51,7 +51,7 @@ export function AIWebsiteGenerator({
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="E.g., A simple landing page for a coffee shop with a hero section, about us, and contact form..."
-            className="mt-1 bg-gray-800 text-white border-gray-700"
+            className="mt-1 bg-[#0a0a0a] text-white border-gray-700"
             rows={4}
           />
         </div>

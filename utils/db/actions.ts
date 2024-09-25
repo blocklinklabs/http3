@@ -15,11 +15,11 @@ console.log("PRIVATE_KEY:", process.env.PRIVATE_KEY);
 let web3StorageClient: any;
 let contract: ethers.Contract;
 
-export async function initializeClients() {
+export async function initializeClients(userEmail: string) {
   web3StorageClient = await create();
 
-  // Authenticate and select a space
-  await web3StorageClient.login("mendsalbert@gmail.com");
+  // Authenticate and select a space using the user's email
+  await web3StorageClient.login(userEmail);
   const spaces = await web3StorageClient.spaces();
   if (spaces.length > 0) {
     await web3StorageClient.setCurrentSpace(spaces[0].did());
@@ -41,8 +41,8 @@ export async function initializeClients() {
   );
 }
 
-// Call this function at the start of your application
-initializeClients().catch(console.error);
+// Remove or comment out this line
+// initializeClients().catch(console.error);
 
 export async function getUserTokens(userId: number) {
   try {

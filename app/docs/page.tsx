@@ -1,186 +1,201 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
-import { ArrowRight } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  ArrowRight,
+  Globe,
+  Cpu,
+  Zap,
+  Search,
+  BarChart,
+  Network,
+} from "lucide-react";
 
 export default function DocsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
-      <div className="container mx-auto px-4 py-8">
-        <Navbar />
-        <h1 className="text-4xl font-bold mb-12 text-left bg-clip-text">
-          HTTP3 Documentation
-        </h1>
+    <div className="min-h-screen bg-[#111] text-white">
+      <div className="container text-white mx-auto px-4 py-8">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold mb-6 text-white">Documentation</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          <Card className="bg-gray-800 border-gray-700 hover:shadow-lg transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle className="text-2xl text-white flex items-center">
-                Getting Started <ArrowRight className="ml-2 h-5 w-5" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="#create-account"
-                    className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
-                  >
-                    Create an account
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#deploy-contract"
-                    className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
-                  >
-                    Deploy your first smart contract
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#manage-deployments"
-                    className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
-                  >
-                    Manage your deployments
-                  </Link>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-white">
+                Getting Started
+              </h2>
+              <Card className="bg-[#1a1a1a] border-gray-800">
+                <CardContent className="p-4">
+                  <ul className="space-y-2">
+                    <li>
+                      <Link
+                        href="#create-account"
+                        className="text-white hover:underline"
+                      >
+                        Create an account
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="#deploy-website"
+                        className="text-white hover:underline"
+                      >
+                        Deploy your first website
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="#manage-deployments"
+                        className="text-white hover:underline"
+                      >
+                        Manage your deployments
+                      </Link>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </section>
 
-          <Card className="bg-gray-800 border-gray-700 hover:shadow-lg transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle className="text-2xl text-white flex items-center">
-                Features <ArrowRight className="ml-2 h-5 w-5" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-white">
-                <li>One-click smart contract deployment</li>
-                <li>Automatic ABI generation</li>
-                <li>Integrated blockchain explorer</li>
-                <li>Secure key management</li>
-              </ul>
-            </CardContent>
-          </Card>
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-white">
+                Features
+              </h2>
+              <Card className="bg-[#1a1a1a] text-white border-gray-800">
+                <CardContent className="p-4">
+                  <ul className="space-y-4 text-white">
+                    <li className="flex items-start">
+                      <Globe className="w-6 h-6 text-white mr-2 mt-1" />
+                      <div>
+                        <h3 className="font-semibold">
+                          Decentralize Deployment
+                        </h3>
+                        <p className="text-sm text-gray-400">
+                          Deploy and access your website forever for free on the
+                          blockchain.
+                        </p>
+                      </div>
+                    </li>
+                    <li className="flex items-start">
+                      <Zap className="w-6 h-6 text-white mr-2 mt-1" />
+                      <div>
+                        <h3 className="font-semibold">
+                          Instant Preview & CI/CD
+                        </h3>
+                        <p className="text-sm text-gray-400">
+                          Automatic deployments from GitHub with instant preview
+                          links and version control.
+                        </p>
+                      </div>
+                    </li>
+                    <li className="flex items-start">
+                      <Cpu className="w-6 h-6 text-white mr-2 mt-1" />
+                      <div>
+                        <h3 className="font-semibold">AI Website Generator</h3>
+                        <p className="text-sm text-gray-400">
+                          Generate a website using AI and deploy it directly to
+                          the blockchain.
+                        </p>
+                      </div>
+                    </li>
+                    <li className="flex items-start">
+                      <Search className="w-6 h-6 text-white mr-2 mt-1" />
+                      <div>
+                        <h3 className="font-semibold">
+                          Decentralized Search Engine
+                        </h3>
+                        <p className="text-sm text-gray-400">
+                          Our search engine has indexed all websites on the
+                          blockchain network.
+                        </p>
+                      </div>
+                    </li>
+                    <li className="flex items-start">
+                      <BarChart className="w-6 h-6 text-white mr-2 mt-1" />
+                      <div>
+                        <h3 className="font-semibold">
+                          Analytics & Monitoring
+                        </h3>
+                        <p className="text-sm text-gray-400">
+                          Real-time analytics dashboard and uptime monitoring
+                          for your decentralized websites.
+                        </p>
+                      </div>
+                    </li>
+                    <li className="flex items-start">
+                      <Network className="w-6 h-6 text-white mr-2 mt-1" />
+                      <div>
+                        <h3 className="font-semibold">Decentralized CDN</h3>
+                        <p className="text-sm text-gray-400">
+                          Utilize our decentralized content delivery network for
+                          faster and more reliable access.
+                        </p>
+                      </div>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </section>
 
-          <Card className="bg-gray-800 border-gray-700 hover:shadow-lg transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle className="text-2xl text-white flex items-center">
-                API Reference <ArrowRight className="ml-2 h-5 w-5" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4 text-white">
-                Integrate HTTP3 into your workflow with our comprehensive API.
-              </p>
-              <Link
-                href="/api-docs"
-                className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
-              >
-                View full API documentation
-              </Link>
-            </CardContent>
-          </Card>
+            <section id="create-account">
+              <h2 className="text-2xl font-semibold mb-4 text-white">
+                Create an Account
+              </h2>
+              <Card className="bg-[#1a1a1a] border-gray-800">
+                <CardContent className="p-4">
+                  <p className="text-white">
+                    To get started with HTTP3, you'll need to create an account.
+                    Use the 'Login' button in the navbar to connect with your
+                    Web3 wallet for a seamless blockchain experience.
+                  </p>
+                </CardContent>
+              </Card>
+            </section>
 
-          <Card className="bg-gray-800 border-gray-700 hover:shadow-lg transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle className="text-2xl text-white flex items-center">
-                Troubleshooting <ArrowRight className="ml-2 h-5 w-5" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="#deployment-issues"
-                    className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
-                  >
-                    Common deployment issues
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#gas-optimization"
-                    className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
-                  >
-                    Gas optimization
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#faq"
-                    className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
-                  >
-                    FAQ
-                  </Link>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
+            <section id="deploy-website">
+              <h2 className="text-2xl font-semibold mb-4 text-white">
+                Deploy Your First Website
+              </h2>
+              <Card className="bg-[#1a1a1a] border-gray-800">
+                <CardContent className="p-4">
+                  <p className="mb-4 text-white">
+                    Once you've connected your wallet, you can deploy your first
+                    website by following these steps:
+                  </p>
+                  <ol className="list-decimal list-inside space-y-2 text-white">
+                    <li>Navigate to the Dashboard</li>
+                    <li>Click on the "Deploy" tab</li>
+                    <li>Enter your domain and website content</li>
+                    <li>
+                      Click "Deploy to HTTP3" and confirm the transaction in
+                      your wallet
+                    </li>
+                    <li>Wait for the deployment to complete</li>
+                    <li>Access your website using the provided IPFS link</li>
+                  </ol>
+                </CardContent>
+              </Card>
+            </section>
 
-        <div className="space-y-16">
-          <section
-            id="create-account"
-            className="bg-gray-800 p-8 rounded-lg shadow-lg"
-          >
-            <h2 className="text-3xl font-bold mb-6 text-white">
-              Create an Account
-            </h2>
-            <p className="text-gray-300 leading-relaxed">
-              To get started with HTTP3, you'll need to create an account. Visit
-              our homepage and click on the "Sign Up" button. Follow the prompts
-              to set up your account using your email address or connect with
-              your Web3 wallet for a seamless blockchain experience.
-            </p>
-          </section>
-
-          <section
-            id="deploy-contract"
-            className="bg-gray-800 p-8 rounded-lg shadow-lg"
-          >
-            <h2 className="text-3xl font-bold mb-6 text-white">
-              Deploy Your First Smart Contract
-            </h2>
-            <p className="text-gray-300 leading-relaxed mb-4">
-              Once you've created an account, you can deploy your first smart
-              contract by following these steps:
-            </p>
-            <ol className="list-decimal pl-5 space-y-2 text-gray-300">
-              <li>Log in to your HTTP3 dashboard</li>
-              <li>Click on the "New Deployment" button</li>
-              <li>
-                Upload your smart contract file or paste your Solidity code
-              </li>
-              <li>Configure your deployment settings and parameters</li>
-              <li>Review the generated ABI and bytecode</li>
-              <li>Click "Deploy" and confirm the transaction in your wallet</li>
-            </ol>
-          </section>
-
-          <section
-            id="manage-deployments"
-            className="bg-gray-800 p-8 rounded-lg shadow-lg"
-          >
-            <h2 className="text-3xl font-bold mb-6 text-white">
-              Manage Your Deployments
-            </h2>
-            <p className="text-gray-300 leading-relaxed mb-4">
-              HTTP3 provides powerful tools to manage your smart contract
-              deployments:
-            </p>
-            <ul className="list-disc pl-5 space-y-2 text-gray-300">
-              <li>View deployment history and contract addresses</li>
-              <li>
-                Interact with your contracts through a user-friendly interface
-              </li>
-              <li>Monitor gas usage and optimize your contracts</li>
-              <li>Upgrade your contracts using proxy patterns</li>
-            </ul>
-          </section>
+            <section id="manage-deployments">
+              <h2 className="text-2xl font-semibold mb-4 text-white">
+                Manage Your Deployments
+              </h2>
+              <Card className="bg-[#1a1a1a] border-gray-800">
+                <CardContent className="p-4">
+                  <p className="mb-4 text-white">
+                    HTTP3 provides tools to manage your website deployments:
+                  </p>
+                  <ul className="list-disc list-inside space-y-2 text-white">
+                    <li>View all your deployed websites in the Dashboard</li>
+                    <li>Edit and update existing websites</li>
+                    <li>Monitor deployment status and IPFS links</li>
+                    <li>Use the CI/CD manager for automated updates</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </section>
+          </div>
         </div>
       </div>
     </div>

@@ -153,7 +153,7 @@ export function DecentralizedCDN() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-gray-900 border-gray-800">
+      <Card className="bg-[#0a0a0a] border-gray-800">
         <CardHeader>
           <CardTitle className="text-xl text-white">Share File</CardTitle>
         </CardHeader>
@@ -169,7 +169,7 @@ export function DecentralizedCDN() {
               id="file-upload"
               type="file"
               onChange={handleFileChange}
-              className="mt-1 bg-gray-800 text-white border-gray-700"
+              className="mt-1 bg-[#0a0a0a] text-white border-gray-700"
             />
           </div>
           <Button
@@ -200,7 +200,7 @@ export function DecentralizedCDN() {
         </CardContent>
       </Card>
 
-      <Card className="bg-gray-900 border-gray-800">
+      <Card className="bg-[#0a0a0a] border-gray-800">
         <CardHeader>
           <CardTitle className="text-xl text-white">Retrieve File</CardTitle>
         </CardHeader>
@@ -217,7 +217,7 @@ export function DecentralizedCDN() {
               value={retrieveHash}
               onChange={(e) => setRetrieveHash(e.target.value)}
               placeholder="Enter file CID"
-              className="mt-1 bg-gray-800 text-white border-gray-700"
+              className="mt-1 bg-[#0a0a0a] text-white border-gray-700"
             />
           </div>
           <Button
@@ -257,7 +257,7 @@ export function DecentralizedCDN() {
         </CardContent>
       </Card>
 
-      <Card className="bg-gray-900 border-gray-800">
+      <Card className="bg-[#0a0a0a] border-gray-800">
         <CardHeader>
           <CardTitle className="text-xl text-white">
             IPFS Network Nodes

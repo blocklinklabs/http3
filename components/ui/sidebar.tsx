@@ -15,8 +15,8 @@ interface SidebarProps {
 
 export function Sidebar({ items, activeItem, setActiveItem }: SidebarProps) {
   return (
-    <div className="flex flex-col w-64 bg-gray-900 text-white h-screen fixed left-0 top-0 overflow-y-auto">
-      <div className="p-6 border-b border-gray-800">
+    <div className="flex flex-col w-64 bg-[#0a0a0a] border-r border-[#18181b] text-white h-screen fixed left-0 top-0 overflow-y-auto">
+      <div className="p-6 border-b border-[#18181b]">
         <Link href="/" className="flex items-center space-x-2">
           <Image
             src="/svg/lock-square-rounded.svg"
@@ -24,7 +24,7 @@ export function Sidebar({ items, activeItem, setActiveItem }: SidebarProps) {
             width={32}
             height={32}
           />
-          <span className="text-2xl font-bold">HTTP3</span>
+          <span className="text-xl font-bold">HTTP3</span>
         </Link>
       </div>
       <nav className="flex-1 p-4">
@@ -33,9 +33,9 @@ export function Sidebar({ items, activeItem, setActiveItem }: SidebarProps) {
             key={item.name}
             variant="ghost"
             className={cn(
-              "w-full justify-start px-4 py-3 mb-2 text-left rounded-lg transition-colors",
+              "w-full justify-start px-4 py-5 mb-2 text-left rounded-lg transition-colors",
               activeItem === item.name
-                ? "bg-blue-600 text-white"
+                ? "bg[#0a0a0a] border-2 text-white"
                 : "text-gray-400 hover:bg-gray-800 hover:text-white"
             )}
             onClick={() => setActiveItem(item.name)}
@@ -45,7 +45,7 @@ export function Sidebar({ items, activeItem, setActiveItem }: SidebarProps) {
           </Button>
         ))}
       </nav>
-      <div className="p-4 border-t border-gray-800">
+      <div className="p-4 border-t border-[#18181b]">
         <p className="text-sm text-gray-500">
           © 2024 HTTP3. All rights reserved.
         </p>

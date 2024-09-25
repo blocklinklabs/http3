@@ -49,7 +49,7 @@ export function SearchEngine() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-gray-900 border-gray-800">
+      <Card className="bg-[#0a0a0a] border-gray-800">
         <CardHeader>
           <CardTitle className="text-2xl text-white">
             Decentralized Search Engine
@@ -62,7 +62,7 @@ export function SearchEngine() {
               placeholder="Enter your search query"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="flex-grow bg-gray-800 text-white border-gray-700"
+              className="flex-grow bg-[#0a0a0a] text-white border-gray-700"
             />
             <Button
               onClick={handleSearch}
