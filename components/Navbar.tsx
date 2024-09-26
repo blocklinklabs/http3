@@ -114,11 +114,11 @@ export default function Navbar() {
           </Button>
           {authenticated && (
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              {/* <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <Menu className="h-5 w-5" />
                 </Button>
-              </DropdownMenuTrigger>
+              </DropdownMenuTrigger> */}
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>
                   <Link href="/profile">Profile</Link>
