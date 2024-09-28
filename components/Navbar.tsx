@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils"; // Make sure you have this utility function
+import { cn } from "@/lib/utils";
 
 export default function Navbar() {
   const { login, logout, authenticated, user } = usePrivy();
@@ -33,7 +33,6 @@ export default function Navbar() {
   }, [authenticated, user]);
 
   useEffect(() => {
-    // Check localStorage when component mounts
     const hasClosedModal = localStorage.getItem("emailConfirmModalClosed");
     if (!hasClosedModal && authenticated) {
       setShowEmailConfirmModal(true);
@@ -49,7 +48,6 @@ export default function Navbar() {
           user.wallet.address,
           user.email?.address || ""
         );
-        // Only show the modal if it hasn't been closed before
         const hasClosedModal = localStorage.getItem("emailConfirmModalClosed");
         if (!hasClosedModal) {
           setShowEmailConfirmModal(true);
@@ -114,11 +112,11 @@ export default function Navbar() {
           </Button>
           {authenticated && (
             <DropdownMenu>
-              {/* <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <Menu className="h-5 w-5" />
                 </Button>
-              </DropdownMenuTrigger> */}
+              </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>
                   <Link href="/profile">Profile</Link>
