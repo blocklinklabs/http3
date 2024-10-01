@@ -155,7 +155,6 @@ export default function DeveloperTools() {
   const [livePreview, setLivePreview] = useState(code);
 
   useEffect(() => {
-    // Update live preview when code changes
     setLivePreview(code);
   }, [code]);
 
