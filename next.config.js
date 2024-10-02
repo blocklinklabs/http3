@@ -6,11 +6,8 @@ const withMDX = require("@next/mdx")({
   },
 });
 
-module.exports = withMDX({
+const nextConfig = withMDX({
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
-});
-/** @type {import('next').NextConfig} */
-const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   eslint: {
@@ -23,6 +20,6 @@ const nextConfig = {
     // your project has type errors.
     ignoreBuildErrors: true,
   },
-};
+});
 
-export default nextConfig;
+module.exports = nextConfig;
