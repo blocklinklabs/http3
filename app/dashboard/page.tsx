@@ -233,7 +233,7 @@ export default function Dashboard() {
           setIsInitialized(true);
         } catch (error) {
           console.error("Failed to initialize clients:", error);
-          setDeploymentError("Failed to initialize. Please try again later.");
+          setDeploymentError("");
         }
       }
     }
